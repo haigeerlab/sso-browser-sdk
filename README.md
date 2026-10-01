@@ -21,10 +21,16 @@
 
 ## 本地验证
 
+使用 Node.js 22.22.0、Python 3.10+ 和 OpenSSL CLI。仓库根目录的测试会启动独立 CAS 参考服务，因此首次运行需安装其 Python 依赖：
+
 ```bash
-npm install
+npm ci
+python3 -m venv services/cas-reference/.venv
+services/cas-reference/.venv/bin/python -m pip install -r services/cas-reference/requirements.lock
 npm test
 ```
+
+GitHub Actions 的 [CI 工作流](.github/workflows/ci.yml)在 `main` 推送和 Pull Request 上执行相同的回归，并审计 SDK 的生产依赖；全仓审计作为已知告警报告，不阻断当前候选。实验性的本地域 Kerberos/Firefox 验证需额外环境，见[测试说明](tests/README.md)。
 
 根目录 `npm test` 运行 SDK 单元测试、构建 Vue/React 两个宿主示例、从 `npm pack` 产物隔离安装并验证类型与 Vite 开发/构建、验证 OIDC/CAS/SAML/WS-Fed 简版夹具，再运行四个协议的独立实现互操作测试。简版夹具可以用 `npm run start --workspace=@sso-test/protocol-fixture` 启动；WS-Fed 参考环境复现条件见 [`services/wsfed-reference`](services/wsfed-reference/README.md)。测试范围见 [回归测试说明](tests/README.md)；SDK 使用方式和后端接口契约见 [SDK README](packages/browser-sdk/README.md)。
 

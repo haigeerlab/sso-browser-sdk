@@ -24,6 +24,6 @@
 
 ## 尚未满足的稳定发布门槛
 
-项目仍没有正式包名、目标 registry、许可证、版本策略、远端代码托管、CI 或发布标签；也没有真实业务宿主与实际认证中心的生产前 HTTPS、Cookie、代理及业务 API 验收。目标浏览器版本与开发链安全处置仍需确定。Negotiate 的企业域验收见[待办](../tasks/negotiate-integration/todo.md)，不会因这份候选快照自动完成。完整门槛见[发布检查表](../docs/SSO_首版发布检查表.md)。
+项目已确定使用 GitHub 公开托管并写入本地 [CI 工作流](../.github/workflows/ci.yml)，但尚未创建远端、运行 GitHub runner 或确定开源许可证；仍没有正式包名、目标 registry、版本策略或发布标签；也没有真实业务宿主与实际认证中心的生产前 HTTPS、Cookie、代理及业务 API 验收。目标浏览器版本与开发链安全处置仍需确定。Negotiate 的企业域验收见[待办](../tasks/negotiate-integration/todo.md)，不会因这份候选快照自动完成。完整门槛见[发布检查表](../docs/SSO_首版发布检查表.md)。
 
 确定正式发布目标并完成真实宿主联调后，应在可追溯提交上重新构建、回归和审计，生成新的确切 tarball；不能直接把此 `private: true`、`0.0.0` 快照视作可发布包。

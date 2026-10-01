@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.22.0'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.10'
+      - name: Install Node dependencies
+        run: npm ci
+      - name: Install CAS reference dependencies
+        run: |
+          python -m venv services/cas-reference/.venv
+          services/cas-reference/.venv/bin/python -m pip install -r services/cas-reference/requirements.lock
+      - name: Check OpenSSL
+        run: openssl version
+      - name: Run SDK and protocol regression tests
+        run: npm test
+      - name: Audit SDK production dependencies
+        run: npm audit --omit=dev --workspace=sso-browser-sdk-prototype --audit-level=low
+      - name: Report full monorepo dependency audit
+        continue-on-error: true
+        run: npm audit --audit-level=low
+      - name: Inspect SDK package manifest
+        run: npm pack --workspace=sso-browser-sdk-prototype --dry-run --json
