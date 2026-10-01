@@ -47,3 +47,10 @@
 - 只读扫描本地 Git 的 4 个提交、447 个已跟踪文件快照：未发现私钥头、常见 GitHub/npm/AWS 令牌形态或 `/Users/<用户名>/` 绝对路径；历史文件名中也没有 `.env`、私钥或证书密钥文件。
 - 检查当前文件中的 URL 主机名：除官方规范/依赖文档与公开服务外，均是 `localhost`、`example.test`、`invalid` 等测试用地址；没有发现企业内部域名。
 - 这些是模式扫描，不能证明所有敏感数据都不存在。首次公开推送前仍需按实际远端、许可证与最终提交清单复核；目前尚未公开推送。
+
+## 2026-10-01 MIT 开源源码候选
+
+- 按用户继续指令采用 `haigeerlab/sso-browser-sdk` 公开 GitHub 仓库、MIT 许可证和 `2026 Haigeerlab Contributors` 版权行；仓库与 SDK 包都含 LICENSE，包元数据包含仓库地址，npm 包仍为 `private: true` 原型。
+- `npm ci` 从锁文件干净安装成功；`npm test` 退出码 0：SDK 单测 20/20、宿主打包兼容 4/4、简版交互 29/29、独立协议互操作 20/20。SDK 生产依赖审计 0 项；全仓安装报告既有 8 个包级告警（2 high、6 moderate），归属见发布检查表。
+- 从提交 `3f4b56e874be3226f3e1559ce06d236575072afe` 打包：17 文件，含 LICENSE，SHA-256 `c198fdda6c7e77841a10a18f25f750f741bccbd56a50e5c9373afbe23bf5f242`；独立临时目录重打包字节相同。确切 tarball 离线安装后，根入口和五个协议子入口均可导入，安装的 LICENSE 与源码一致。
+- 此时尚未创建远端或运行 GitHub Actions，候选仍不是 npm 稳定版。

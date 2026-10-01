@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 单元、兼容、简版交互、独立互操作 | 仓库根目录 `npm test` | 本机通过，见[验证记录](../tasks/release-readiness/verification.md) |
 | 实际包隔离安装 | `npm run test:compat`，Vue/React 分别从同一 `npm pack` tarball 安装 | 通过 |
-| 包文件与运行时依赖 | `npm pack --workspace=sso-browser-sdk-prototype --dry-run --json` | 16 个文件、无运行时依赖；测试服务/密钥不入包 |
+| 包文件与运行时依赖 | `npm pack --workspace=sso-browser-sdk-prototype --dry-run --json` | 17 个文件、含 MIT LICENSE、无运行时依赖；测试服务/密钥不入包 |
 | 后端接口与协议责任 | [接入指南](SSO_首版接入指南.md) | 文档已列出；待真实业务后端核对 |
 | 依赖审计 | `npm audit --json` 与 `npm audit --omit=dev --workspace=sso-browser-sdk-prototype --json` | 全仓 8 个包级告警（2 high、6 moderate）；SDK 工作区生产依赖告警 0 项 |
 | 文档与能力图 | Spec Guard `verify-artifacts.sh` | 3 通过、0 失败；历史状态文件提示不代表远端验证 |
@@ -18,7 +18,7 @@
 | 门槛 | 当前事实 | 进入稳定发布前要完成 |
 | --- | --- | --- |
 | 正式发布目标 | SDK 仍名为 `sso-browser-sdk-prototype@0.0.0` 且 `private: true` | 确定 npm 公共/私有 registry、正式包名、命名权、版本号与发布权限；审阅最终 tarball |
-| 开源许可证与元数据 | 用户已确定项目公开开源；当前仓库尚无 LICENSE，包未声明 `license`、`engines`、仓库地址与支持政策 | 确定开源许可证及版权信息，补齐仓库与包元数据，再公开仓库和发布包 |
+| 开源许可证与元数据 | 已选 MIT；根仓库与 SDK 包均含 LICENSE，包声明 `license` 与拟建 GitHub 地址；`engines` 与支持政策尚未声明 | 核对首次公开仓库的许可证识别，确定正式发布前的包名、运行环境和支持政策 |
 | 版本可追溯与自动回归 | 已建立本地 Git 基线提交 `173fabf`；代码托管选 GitHub，已编写 [CI 工作流](../.github/workflows/ci.yml)，但尚无远端、GitHub runner 执行记录或发布标签 | 创建公开仓库，在干净提交上自动运行回归并记录版本标签和发布构建来源 |
 | 真实业务接入 | 只有本机参考 IdP/SP 与示例宿主 | 至少一个真实业务宿主接入实际认证中心，验收 HTTPS、Cookie、代理、多实例、异常与业务 API 鉴权 |
 | 浏览器版本矩阵 | 已用 Codex 内置浏览器实测，但其精确 Chromium 版本未暴露 | 在可识别版本的目标浏览器复测首版代表流程并记录版本 |
@@ -40,4 +40,4 @@
 
 1. 固定正式包名、registry、版本、许可证和发布账号；在干净 Git 提交上运行全量测试与审计，记录结果。
 2. 打出确切 tarball，复查 `files`、`exports`、类型和哈希；用该文件在真实宿主安装并完成目标环境联调。
-3. 对照支持矩阵与剩余风险审阅发布说明。得到用户对**目标 registry、包名、版本和最终发布**的确认后再推送；推送后核对 registry 返回的版本与可安装性。
+3. 对照支持矩阵与剩余风险审阅发布说明。得到用户对**目标 registry、包名、版本和最终发布**的确认后再向 registry 发布；发布后核对 registry 返回的版本与可安装性。
