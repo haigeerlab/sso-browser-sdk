@@ -18,8 +18,8 @@
 | 门槛 | 当前事实 | 进入稳定发布前要完成 |
 | --- | --- | --- |
 | 正式发布目标 | SDK 仍名为 `sso-browser-sdk-prototype@0.0.0` 且 `private: true` | 确定 npm 公共/私有 registry、正式包名、命名权、版本号与发布权限；审阅最终 tarball |
-| 开源许可证与元数据 | 已选 MIT；根仓库与 SDK 包均含 LICENSE，包声明 `license` 与拟建 GitHub 地址；`engines` 与支持政策尚未声明 | 核对首次公开仓库的许可证识别，确定正式发布前的包名、运行环境和支持政策 |
-| 版本可追溯与自动回归 | 已建立本地 Git 基线提交 `173fabf`；代码托管选 GitHub，已编写 [CI 工作流](../.github/workflows/ci.yml)，但尚无远端、GitHub runner 执行记录或发布标签 | 创建公开仓库，在干净提交上自动运行回归并记录版本标签和发布构建来源 |
+| 开源许可证与元数据 | 已选 MIT；根仓库与 SDK 包均含 LICENSE，GitHub 已识别 MIT；包声明 `license` 与仓库地址，`engines` 与支持政策尚未声明 | 确定正式发布前的包名、运行环境和支持政策 |
+| 版本可追溯与自动回归 | [公开 GitHub 仓库](https://github.com/haigeerlab/sso-browser-sdk) 的 `main` 已推送完整历史；首次 [CI 运行](https://github.com/haigeerlab/sso-browser-sdk/actions/runs/36872579563) 在 `18ae946` 成功，尚无发布标签 | 正式包发布时从已通过 CI 的提交打标签，并记录包与提交的对应关系 |
 | 真实业务接入 | 只有本机参考 IdP/SP 与示例宿主 | 至少一个真实业务宿主接入实际认证中心，验收 HTTPS、Cookie、代理、多实例、异常与业务 API 鉴权 |
 | 浏览器版本矩阵 | 已用 Codex 内置浏览器实测，但其精确 Chromium 版本未暴露 | 在可识别版本的目标浏览器复测首版代表流程并记录版本 |
 | 开发链安全 | Vite 5.0.0 与 esbuild 0.19.12 被当前审计标记 | 保留 Vite 5.0.0 **兼容测试**；实际宿主开发环境评估受支持且已修复的工具版本，不对外暴露旧开发服务；记录最终依赖审计与风险决定 |

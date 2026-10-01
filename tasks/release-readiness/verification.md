@@ -59,3 +59,9 @@
 
 - SAML 独立互操作依赖的 XSD 验证器在 `npm ci` 安装脚本中调用 `javac`；GitHub CI 已在 `npm ci` 前通过 `actions/setup-java@v6` 固定 Temurin 21，而不依赖 runner 镜像碰巧预装的 JDK。依据参考服务 README 与官方 setup-java 用法。
 - 本机此前从锁文件运行 `npm ci` 和全量 `npm test` 通过；新增的是 runner 环境配置，尚无 GitHub Actions 实跑记录。
+
+## 2026-10-01 公开仓库与首次 GitHub runner 回归
+
+- 用户明确授权创建公开 `haigeerlab/sso-browser-sdk` 并推送本地 `main` 完整历史；GitHub 仓库已创建，远端 `main` 与本地提交 `18ae9466658f03b01773d4e429ff383244ca8cbb` 一致，GitHub 返回 `PUBLIC` 且识别 `MIT License`。
+- [首次 CI 运行 36872579563](https://github.com/haigeerlab/sso-browser-sdk/actions/runs/36872579563) 在该提交上结论为 `success`，耗时约 1 分 16 秒：Node、Python、Temurin JDK 安装、`npm ci`、CAS Python 依赖、全量测试、SDK 生产依赖审计与包清单步骤均成功。
+- 全仓 `npm audit` 在私有测试依赖中报告 8 项（2 high、6 moderate）；原先 `continue-on-error` 使该步骤虽不阻断 CI，仍在页面留下红色退出码注解。工作流已改为解析 JSON 并输出摘要；本机按工作流命令复验输出 8 项与受影响包名，云端复验由后续提交的 CI 负责。

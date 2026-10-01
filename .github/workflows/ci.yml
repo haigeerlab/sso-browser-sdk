@@ -40,7 +40,19 @@ jobs:
       - name: Audit SDK production dependencies
         run: npm audit --omit=dev --workspace=sso-browser-sdk-prototype --audit-level=low
       - name: Report full monorepo dependency audit
-        continue-on-error: true
-        run: npm audit --audit-level=low
+        run: |
+          npm audit --json > "$RUNNER_TEMP/monorepo-audit.json" || true
+          node - "$RUNNER_TEMP/monorepo-audit.json" <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (report.error || !report.metadata?.vulnerabilities) {
+            console.error('Full monorepo audit failed:', report.error?.summary ?? 'missing vulnerability totals');
+            process.exitCode = 1;
+          } else {
+            const { low, moderate, high, critical, total } = report.metadata.vulnerabilities;
+            console.log(`Full monorepo audit: ${total} findings (${high} high, ${moderate} moderate, ${low} low, ${critical} critical)`);
+            console.log('Affected packages:', Object.keys(report.vulnerabilities ?? {}).join(', ') || 'none');
+          }
+          NODE
       - name: Inspect SDK package manifest
         run: npm pack --workspace=sso-browser-sdk-prototype --dry-run --json
