@@ -54,3 +54,8 @@
 - `npm ci` 从锁文件干净安装成功；`npm test` 退出码 0：SDK 单测 20/20、宿主打包兼容 4/4、简版交互 29/29、独立协议互操作 20/20。SDK 生产依赖审计 0 项；全仓安装报告既有 8 个包级告警（2 high、6 moderate），归属见发布检查表。
 - 从提交 `3f4b56e874be3226f3e1559ce06d236575072afe` 打包：17 文件，含 LICENSE，SHA-256 `c198fdda6c7e77841a10a18f25f750f741bccbd56a50e5c9373afbe23bf5f242`；独立临时目录重打包字节相同。确切 tarball 离线安装后，根入口和五个协议子入口均可导入，安装的 LICENSE 与源码一致。
 - 此时尚未创建远端或运行 GitHub Actions，候选仍不是 npm 稳定版。
+
+## 2026-10-01 CI JDK 前置条件补齐
+
+- SAML 独立互操作依赖的 XSD 验证器在 `npm ci` 安装脚本中调用 `javac`；GitHub CI 已在 `npm ci` 前通过 `actions/setup-java@v6` 固定 Temurin 21，而不依赖 runner 镜像碰巧预装的 JDK。依据参考服务 README 与官方 setup-java 用法。
+- 本机此前从锁文件运行 `npm ci` 和全量 `npm test` 通过；新增的是 runner 环境配置，尚无 GitHub Actions 实跑记录。

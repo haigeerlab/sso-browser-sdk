@@ -21,7 +21,7 @@
 
 ## 本地验证
 
-使用 Node.js 22.22.0、Python 3.10+ 和 OpenSSL CLI。仓库根目录的测试会启动独立 CAS 参考服务，因此首次运行需安装其 Python 依赖：
+使用 Node.js 22.22.0、Python 3.10+、OpenSSL CLI 和具备 `java`/`javac` 的 JDK（CI 固定 Temurin 21）。仓库根目录的测试会启动独立 CAS 参考服务，因此首次运行需安装其 Python 依赖：
 
 ```bash
 npm ci
