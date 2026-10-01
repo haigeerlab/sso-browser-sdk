@@ -2,6 +2,12 @@
   "name": "sso-browser-sdk-prototype",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haigeerlab/sso-browser-sdk.git",
+    "directory": "packages/browser-sdk"
+  },
   "type": "module",
   "files": ["dist"],
   "exports": {

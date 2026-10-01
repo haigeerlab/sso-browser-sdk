@@ -1,6 +1,8 @@
 {
   "name": "sso-browser-sdk-repo",
   "private": true,
+  "license": "MIT",
+  "repository": "https://github.com/haigeerlab/sso-browser-sdk",
   "workspaces": ["packages/*", "apps/*", "services/*"],
   "scripts": {
     "test:unit": "npm test --workspace=sso-browser-sdk-prototype",

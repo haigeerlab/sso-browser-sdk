@@ -35,3 +35,7 @@ GitHub Actions 的 [CI 工作流](.github/workflows/ci.yml)在 `main` 推送和 
 根目录 `npm test` 运行 SDK 单元测试、构建 Vue/React 两个宿主示例、从 `npm pack` 产物隔离安装并验证类型与 Vite 开发/构建、验证 OIDC/CAS/SAML/WS-Fed 简版夹具，再运行四个协议的独立实现互操作测试。简版夹具可以用 `npm run start --workspace=@sso-test/protocol-fixture` 启动；WS-Fed 参考环境复现条件见 [`services/wsfed-reference`](services/wsfed-reference/README.md)。测试范围见 [回归测试说明](tests/README.md)；SDK 使用方式和后端接口契约见 [SDK README](packages/browser-sdk/README.md)。
 
 目前 OIDC、CAS、SAML 已完成首版本机验证；WS-Fed 已完成独立 STS/RP 本机互操作和 Vue/React 浏览器流程，但暂保留为扩展实验能力，详见 [`tasks/wsfed-integration/verification.md`](tasks/wsfed-integration/verification.md)。Negotiate 已有本地真实 Kerberos 与 HTTPS/Firefox 证据，但仍待企业受管浏览器和域环境，详见[验证记录](tasks/negotiate-integration/verification.md)。打包 SDK 的宿主兼容证据见 [`tasks/host-compatibility/verification.md`](tasks/host-compatibility/verification.md)，业务接入要求见[首版接入指南](docs/SSO_首版接入指南.md)，[本地候选快照](release-candidate/README.md)记录了确切 tarball 与哈希，[变更记录](CHANGELOG.md)说明候选范围，发布条件见[首版发布检查表](docs/SSO_首版发布检查表.md)。生产认证中心与真实业务宿主仍需单独验收。参考实现使用开发专用的内存存储、临时签名材料和登录页，仅用于本机测试。Webpack 按当前要求暂缓。
+
+## 许可证
+
+本仓库按 [MIT 许可证](LICENSE)开放。SDK npm 包仍处于 `private: true` 的本地候选阶段；公开源码不代表已经发布正式包。
