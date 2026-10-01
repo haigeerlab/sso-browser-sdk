@@ -1,0 +1,12 @@
+node_modules/
+dist/
+apps/compat/build/
+.env
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+.agent/state.json
+services/cas-reference/.venv/
+services/cas-reference/*.sqlite3
+release-candidate/*.tgz

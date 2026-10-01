@@ -1,0 +1,14 @@
+{
+  "appA": {
+    "origin": "https://app-a.example.test",
+    "sessionEndpoint": "/sso/session",
+    "loginEndpoint": "/sso/negotiate/start",
+    "returnTo": "/"
+  },
+  "appB": {
+    "origin": "https://app-b.example.test",
+    "sessionEndpoint": "/sso/session",
+    "loginEndpoint": "/sso/negotiate/start",
+    "returnTo": "/"
+  }
+}

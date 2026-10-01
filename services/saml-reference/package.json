@@ -1,0 +1,14 @@
+{
+  "name": "@sso-test/saml-reference",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@node-saml/node-saml": "5.1.0",
+    "samlify": "2.13.1",
+    "@authenio/samlify-xsd-schema-validator": "1.0.5",
+    "@xmldom/xmldom": "0.8.15"
+  }
+}

@@ -1,0 +1,35 @@
+# release-readiness 验证记录
+
+日期：2026-10-01。本模块完成本机候选证据收口，**没有发布 npm 包，也不声明生产稳定版就绪**。
+
+## 首版能力证据
+
+| 范围 | 已验证内容 | 证据 |
+| --- | --- | --- |
+| SDK 核心 | 会话状态、`401` 与故障区分、同源回跳、防循环、手动重试、本域登出 | [sdk-core](../sdk-core/verification.md)、20 项单测 |
+| OIDC 宿主模式 | `oidc-provider` 9.12.2 + `openid-client` 6.8.8；授权码 + PKCE、双宿主、过期、取消、重放 | [OIDC 记录](../oidc-integration/verification.md)、独立互操作 3 项 |
+| CAS 宿主模式 | `django-cas-server` 3.1.0；双宿主、错误服务、票据过期/重放、失败 | [CAS 记录](../cas-integration/verification.md)、独立互操作 5 项 |
+| SAML 宿主模式 | `samlify` 2.13.1 + `node-saml` 5.1.0；签名、受众/地址、时效、请求关联、重放 | [SAML 记录](../saml-integration/verification.md)、独立互操作 5 项 |
+| 宿主兼容 | 同一 tarball 分别安装到 Vue 3.4.0、React 19.3.0、Vite 5.0.0；类型、开发与构建、浏览器代表路径 | [兼容记录](../host-compatibility/verification.md)、兼容测试 4 项 |
+
+此处的简版后端交互 14 项用于验证跳转、会话和错误流转，不被当作协议安全实现。独立参考服务同样只证明本机互操作；生产认证中心和真实业务宿主没有验收证据。在本次首版候选收口时，WS-Fed、Negotiate 只有前端入口单测；两者后续已有独立本机证据，分别见 [WS-Fed](../wsfed-integration/verification.md) 和 [Negotiate](../negotiate-integration/verification.md) 模块记录，仍不改变首版正式支持范围。
+
+## 本次复测
+
+- `npm test` 退出码 0：SDK 单测 **20/20**，Vue/React 的 Vite 5.0.0 构建通过，tarball 隔离安装兼容测试 **4/4**，简版交互 **14/14**，独立协议互操作 **13/13**。
+- `npm pack --workspace=sso-browser-sdk-prototype --dry-run --json`：`sso-browser-sdk-prototype@0.0.0`，16 个文件，约 6.3 kB；`README.md`、`package.json` 及 `dist/*.js`/`dist/*.d.ts`。无运行时 `dependencies`、无 bundled 依赖；没有示例宿主、参考服务、证书、私钥或测试文件。
+- `npm audit --omit=dev --workspace=sso-browser-sdk-prototype --json`：0 项生产依赖告警。`npm audit --json`：2 个**包级**告警，Vite 为 high、esbuild 为 moderate；前者聚合多条安全公告，不能解读成总共只有两条漏洞。安装路径为私有 `apps/compat` → Vite 5.0.0 → esbuild 0.19.12，未进入 SDK tarball。说明与处置边界见[发布检查表](../../docs/SSO_首版发布检查表.md)。
+- 已提供[业务前后端接入指南](../../docs/SSO_首版接入指南.md)，包含同源会话、协议回调、Cookie、CSRF、安全回跳和错误/登出语义；根 README 和 SDK README 已链接并标明实验入口。
+- Spec Guard `verify-artifacts.sh`：3 通过、0 失败；另有历史状态文件提示，远端 tracker 映射没有被读取或验证。
+
+## 发布结论与阻断项
+
+当前只能称为**已完成本机验证的私有原型候选**。以下条件仍未满足：
+
+1. 包为 `private: true`、`0.0.0`，正式包名、目标 registry、许可证、版本策略和发布权限未确定；没有对外发布动作授权。
+2. 项目目录没有 Git 仓库或 CI，因此缺少可追溯提交/标签与自动发布回归。
+3. 未接入真实业务宿主和实际统一认证中心，生产 HTTPS、Cookie、反向代理、业务 API、分布式会话及密钥轮换未验收。
+4. Codex 内置浏览器完成代表流程，但接口未提供精确 Chromium 版本；没有可标识版本的目标浏览器记录。
+5. 用户指定的 Vite 5.0.0 兼容测试通过，但其开发链审计告警仍在。不能把旧开发服务对外暴露，实际宿主构建工具的版本与风险处置需单独确认；这不改变 SDK 无 Vite 运行时依赖的事实。
+
+上述条件具体检查顺序见[发布检查表](../../docs/SSO_首版发布检查表.md)。下一步需业务方提供目标包名/registry与首个真实宿主环境，才能继续将原型转换为可发布版本并完成生产前验收。

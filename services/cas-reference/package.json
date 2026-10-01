@@ -1,0 +1,8 @@
+{
+  "name": "@sso-test/cas-reference",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "fast-xml-parser": "5.11.2"
+  }
+}

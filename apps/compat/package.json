@@ -1,0 +1,20 @@
+{
+  "name": "sso-sdk-compat-examples",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:vue": "vite build --config vite.config.js",
+    "build:react": "vite build --config vite.react.config.js",
+    "build": "npm run build:vue && npm run build:react"
+  },
+  "dependencies": {
+    "sso-browser-sdk-prototype": "0.0.0",
+    "vue": "3.4.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.0.1",
+    "vite": "5.0.0"
+  }
+}

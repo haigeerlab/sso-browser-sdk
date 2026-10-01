@@ -1,0 +1,15 @@
+{
+  "name": "sso-browser-sdk-repo",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*", "services/*"],
+  "scripts": {
+    "test:unit": "npm test --workspace=sso-browser-sdk-prototype",
+    "build:hosts": "npm run build --workspace=sso-sdk-compat-examples",
+    "test:compat": "node --test tests/compat/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:interop": "node --test tests/interop/*.test.mjs",
+    "test:kerberos:local": "npm run build --workspace=sso-browser-sdk-prototype && python3 tests/interop/kerberos-lab/run.py",
+    "test": "npm run test:unit && npm run build:hosts && npm run test:compat && npm run test:integration && npm run test:interop",
+    "pack:sdk": "npm pack --workspace=sso-browser-sdk-prototype"
+  }
+}

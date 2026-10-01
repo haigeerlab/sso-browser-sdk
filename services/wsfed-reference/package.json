@@ -1,0 +1,14 @@
+{
+  "name": "@sso-test/wsfed-reference",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "0.9.12",
+    "express": "5.2.1",
+    "passport-wsfed-saml2": "4.6.4",
+    "wsfed": "8.0.0"
+  }
+}

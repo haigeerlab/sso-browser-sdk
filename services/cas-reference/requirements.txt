@@ -1,0 +1,2 @@
+Django==5.2.17
+django-cas-server==3.1.0

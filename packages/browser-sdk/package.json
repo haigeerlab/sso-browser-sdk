@@ -1,0 +1,40 @@
+{
+  "name": "sso-browser-sdk-prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./oidc": {
+      "types": "./dist/oidc.d.ts",
+      "import": "./dist/oidc.js"
+    },
+    "./saml": {
+      "types": "./dist/saml.d.ts",
+      "import": "./dist/saml.js"
+    },
+    "./cas": {
+      "types": "./dist/cas.d.ts",
+      "import": "./dist/cas.js"
+    },
+    "./wsfed": {
+      "types": "./dist/wsfed.d.ts",
+      "import": "./dist/wsfed.js"
+    },
+    "./negotiate": {
+      "types": "./dist/negotiate.d.ts",
+      "import": "./dist/negotiate.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}
