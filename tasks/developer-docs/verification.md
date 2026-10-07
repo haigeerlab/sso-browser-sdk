@@ -1,6 +1,6 @@
 # developer-docs 验证与开发者审阅
 
-日期：2026-10-07。验证时位置：分支 `main`，工作区 `/Users/vilin/Documents/haigeerlab/sso-browser-sdk`。基准提交：`8868268ff05314724f25ceb00706827ef1433936`；本轮结果属于基准之上的文档改动，交付整理至本地分支 `codex/developer-docs`。未推送、未部署、未发布 npm 包。
+日期：2026-10-07。验证时分支：`main`。基准提交：`8868268ff05314724f25ceb00706827ef1433936`；本轮结果属于基准之上的文档改动，交付整理至本地分支 `codex/developer-docs`。未推送、未部署、未发布 npm 包。
 
 ## 本批结论
 
