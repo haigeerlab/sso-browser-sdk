@@ -12,7 +12,9 @@
 
 新协议的简版后端夹具放在 `services/`，对应的交互测试放在 `tests/integration/`；真实提供方的互操作测试放在 `tests/interop/`。两类测试文件名以 `.test.mjs` 结尾即可进入根目录回归。真实协议测试记录提供方版本、配置、浏览器和结果，不能以简版夹具代替。
 
-当前有 OIDC、CAS、SAML 与 WS-Fed 形态的**简版交互夹具**。CAS 覆盖固定 `service`、一次性/过期票据；SAML 覆盖 Redirect/POST、RelayState 与失败反馈；WS-Fed 覆盖固定 realm/reply、一次性 `wctx`、POST 回调、中心会话、过期/重放和取消。简版夹具不验签。独立参考环境分别使用 OIDC `oidc-provider` 9.12.2 + `openid-client` 6.8.8、CAS `django-cas-server` 3.1.0、SAML `samlify` 2.13.1 + `@node-saml/node-saml` 5.1.0、WS-Fed `wsfed` 8.0.0 + `passport-wsfed-saml2` 4.6.4。本地 HTTP 与测试账号配置不代表生产认证中心。Negotiate 仍只有前端入口单测。
+当前有 OIDC、CAS、SAML 与 WS-Fed 形态的**简版交互夹具**。CAS 覆盖固定 `service`、一次性/过期票据；SAML 覆盖 Redirect/POST、RelayState 与失败反馈；WS-Fed 覆盖固定 realm/reply、一次性 `wctx`、POST 回调、中心会话、过期/重放和取消。简版夹具不验签。独立参考环境分别使用 OIDC `oidc-provider` 9.12.2 + `openid-client` 6.8.8、CAS `django-cas-server` 3.1.0、SAML `samlify` 2.13.1 + `@node-saml/node-saml` 5.1.0、WS-Fed `wsfed` 8.0.0 + `passport-wsfed-saml2` 4.6.4。本地 HTTP 与测试账号配置不代表生产认证中心。Negotiate 另有 HTTP 夹具、匿名预检与[可选真实本地 Kerberos 实验](interop/kerberos-lab/README.md)，企业域验收仍未完成。
+
+开发者文档示例另用 `npm run docs:check` 验证链接、tarball 安装与 TS/Vue/React 类型和构建；`npm run docs:examples` 加载页面引用的源码与独立参考后端联调。详见[文档 Demo 总览](../apps/docs/content/demos/overview.md)。
 
 首次运行 CAS 互操作前，按 [`services/cas-reference/README.md`](../services/cas-reference/README.md) 创建隔离 Python 环境。
 首次运行 SAML 互操作前，按 [`services/saml-reference/README.md`](../services/saml-reference/README.md) 确认 OpenSSL、JDK 和 XSD 验证器安装步骤。

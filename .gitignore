@@ -10,3 +10,6 @@ __pycache__/
 services/cas-reference/.venv/
 services/cas-reference/*.sqlite3
 release-candidate/*.tgz
+apps/docs/.vitepress/cache/
+apps/docs/.vitepress/dist/
+apps/docs/.examples-build/

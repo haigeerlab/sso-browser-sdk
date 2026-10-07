@@ -8,6 +8,7 @@ import * as oidc from 'openid-client';
 
 // Local interoperability service. Dev interactions and ephemeral signing keys are test-only.
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const buildRoot = process.env.SSO_COMPAT_BUILD_ROOT ?? join(root, 'apps/compat/build');
 const secret = 'local-reference-client-secret';
 const sessions = new Map();
 const pending = new Map();
@@ -47,13 +48,12 @@ async function hostRequest(req, res) {
   if (!app) return send(res, 404);
 
   if (url.pathname === `/${app}/`) {
-    const page = await readFile(join(root, app === 'app-a'
-      ? 'apps/compat/build/vue/index.html' : 'apps/compat/build/react/index.html'));
+    const page = await readFile(join(buildRoot, app === 'app-a' ? 'vue' : 'react', 'index.html'));
     send(res, 200, page, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
   if (new RegExp(`^/${app}/assets/[\\w-]+\\.js$`).test(url.pathname)) {
-    const source = await readFile(join(root, 'apps/compat/build', app === 'app-a' ? 'vue' : 'react',
+    const source = await readFile(join(buildRoot, app === 'app-a' ? 'vue' : 'react',
       'assets', url.pathname.split('/').at(-1)));
     send(res, 200, source, { 'Content-Type': 'text/javascript; charset=utf-8' });
     return;

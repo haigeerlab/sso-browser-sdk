@@ -15,6 +15,7 @@ import xmldom from '@xmldom/xmldom';
 const { SAML } = wsfedRp.SAML;
 const { DOMParser } = xmldom;
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const buildRoot = process.env.SSO_COMPAT_BUILD_ROOT ?? join(root, 'apps/compat/build');
 const temp = mkdtempSync(join(tmpdir(), 'sso-wsfed-reference-'));
 process.on('exit', () => rmSync(temp, { recursive: true, force: true }));
 const keyPath = join(temp, 'sts.key');
@@ -214,13 +215,11 @@ app.use(async (req, res, next) => {
     } catch (error) { return failed(error.message); }
   }
   if (path === `/${appName}/` && req.method === 'GET') {
-    const page = await readFile(join(root, appName === 'app-a'
-      ? 'apps/compat/build/vue/index.html' : 'apps/compat/build/react/index.html'));
+    const page = await readFile(join(buildRoot, appName === 'app-a' ? 'vue' : 'react', 'index.html'));
     return res.type('html').send(page);
   }
   if (/^\/(app-a|app-b)\/assets\/[\w-]+\.js$/.test(path)) {
-    const asset = await readFile(join(root, appName === 'app-a'
-      ? 'apps/compat/build/vue/assets' : 'apps/compat/build/react/assets', path.split('/').at(-1)));
+    const asset = await readFile(join(buildRoot, appName === 'app-a' ? 'vue/assets' : 'react/assets', path.split('/').at(-1)));
     return res.type('js').send(asset);
   }
   return next();

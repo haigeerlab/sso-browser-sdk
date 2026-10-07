@@ -4,10 +4,30 @@
 
 这个仓库统一维护前端 SDK、Vue/React 宿主示例、认证中心与宿主后端的测试夹具。**对业务方发布的仍是一个 npm 包**；测试服务和示例应用均为私有工作区，不进入 SDK 包。
 
+## 开发者文档站
+
+文档站源文件位于 [`apps/docs`](apps/docs)。安装仓库依赖后，在根目录运行：
+
+```bash
+npm run docs:dev
+```
+
+访问终端输出的本地地址。推荐阅读：[接入前检查](apps/docs/content/guide/prerequisites.md) → [安装](apps/docs/content/guide/quick-start.md) → [Vue](apps/docs/content/frameworks/vue.md) / [React](apps/docs/content/frameworks/react.md) → [后端契约](apps/docs/content/backend/contract.md) → [协议接入](apps/docs/content/protocols/oidc.md) → [排错](apps/docs/content/deployment/troubleshooting.md)。当前生成本地静态站，未启用远端托管。
+
+| 命令 | 用途 |
+| --- | --- |
+| `npm run docs:build` | 静态构建，检查站内死链 |
+| `npm run docs:preview` | 预览静态产物 |
+| `npm run docs:check` | 文档链接/锚点与 tarball 隔离消费者的类型、构建、配置检查 |
+| `npm run docs:examples` | 用实际 tarball 和文档示例源码启动 OIDC 双宿主联调 |
+
+选择其他参考协议：`SSO_DOCS_PROTOCOL=cas`、`saml` 或 `wsfed`；CAS 需先准备下面的 Python 环境。详细操作见 [Demo 总览](apps/docs/content/demos/overview.md)。SDK 包尚未发布，业务项目使用 [tgz 安装步骤](apps/docs/content/guide/quick-start.md)。
+
 | 目录 | 作用 | 发布 |
 | --- | --- | --- |
 | [`packages/browser-sdk`](packages/browser-sdk) | 无框架依赖的 SSO 核心及协议入口、单元测试 | 未来唯一发布包 |
 | [`apps/compat`](apps/compat) | Vue 3.4.0 / React 示例，均固定 Vite 5.0.0 | 不发布 |
+| [`apps/docs`](apps/docs) | 文档站、完整接入示例与示例验收工具 | 不发布到 SDK 包 |
 | [`services/protocol-fixture`](services/protocol-fixture) | 本机认证中心与两个宿主后端的简版交互夹具 | 不发布 |
 | [`services/oidc-reference`](services/oidc-reference) | 基于真实 OIDC 提供方和客户端库的本机互操作服务 | 不发布 |
 | [`services/cas-reference`](services/cas-reference) | 独立 Django CAS 提供方的本机互操作服务 | 不发布 |
