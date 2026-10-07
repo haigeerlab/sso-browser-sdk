@@ -12,6 +12,11 @@
     "test:interop": "node --test tests/interop/*.test.mjs",
     "test:kerberos:local": "npm run build --workspace=sso-browser-sdk-prototype && python3 tests/interop/kerberos-lab/run.py",
     "test": "npm run test:unit && npm run build:hosts && npm run test:compat && npm run test:integration && npm run test:interop",
-    "pack:sdk": "npm pack --workspace=sso-browser-sdk-prototype"
+    "pack:sdk": "npm pack --workspace=sso-browser-sdk-prototype",
+    "docs:dev": "npm run dev --workspace=@sso-docs/site --",
+    "docs:build": "npm run build --workspace=@sso-docs/site --",
+    "docs:preview": "npm run preview --workspace=@sso-docs/site --",
+    "docs:check": "npm run build --workspace=sso-browser-sdk-prototype && npm run check --workspace=@sso-docs/site",
+    "docs:examples": "npm run build --workspace=sso-browser-sdk-prototype && node apps/docs/scripts/serve-examples.mjs"
   }
 }

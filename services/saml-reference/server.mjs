@@ -16,6 +16,7 @@ const { SAML } = nodeSaml;
 const { DOMParser } = xmldom;
 samlify.setSchemaValidator(validator);
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const buildRoot = process.env.SSO_COMPAT_BUILD_ROOT ?? join(root, 'apps/compat/build');
 const temp = mkdtempSync(join(tmpdir(), 'sso-saml-reference-'));
 process.on('exit', () => rmSync(temp, { recursive: true, force: true }));
 const keyPath = join(temp, 'idp.key');
@@ -247,14 +248,12 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (url.pathname === `/${app}/`) {
-      const page = await readFile(join(root, app === 'app-a'
-        ? 'apps/compat/build/vue/index.html' : 'apps/compat/build/react/index.html'));
+      const page = await readFile(join(buildRoot, app === 'app-a' ? 'vue' : 'react', 'index.html'));
       send(res, 200, page, { 'Content-Type': 'text/html; charset=utf-8' });
       return;
     }
     if (/^\/(app-a|app-b)\/assets\/[\w-]+\.js$/.test(url.pathname)) {
-      const asset = await readFile(join(root, app === 'app-a'
-        ? 'apps/compat/build/vue/assets' : 'apps/compat/build/react/assets', url.pathname.split('/').at(-1)));
+      const asset = await readFile(join(buildRoot, app === 'app-a' ? 'vue/assets' : 'react/assets', url.pathname.split('/').at(-1)));
       send(res, 200, asset, { 'Content-Type': 'text/javascript; charset=utf-8' });
       return;
     }

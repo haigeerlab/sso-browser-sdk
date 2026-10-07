@@ -22,9 +22,10 @@
 | host-compatibility | 验证同一 SDK 在 Vue 3.4.0、React 与 Vite 5.0.0 宿主中的接入边界。 | sdk-core,oidc-integration,cas-integration,saml-integration |
 | release-readiness | 汇总 OIDC、CAS、SAML 与宿主兼容证据、后端要求和包内容，确定首版可发布范围。 | oidc-integration,cas-integration,saml-integration,host-compatibility |
 | wsfed-integration | 接入宿主后端 WS-Federation 被动登录模式，验证真实提供方交互并补充扩展版本验收。 | sdk-core,release-readiness |
+| developer-docs | 交付开发者文档站与包 README，验证按协议和框架接入后端会话的可执行示例。 | sdk-core, release-readiness, wsfed-integration |
 | negotiate-integration | 接入 HTTP Negotiate 模式，在受管浏览器和域环境中验证交互并补充扩展版本验收。 | sdk-core,release-readiness |
 
-Build order: sdk-core → oidc-integration → cas-integration → saml-integration → host-compatibility → release-readiness → wsfed-integration → negotiate-integration
+Build order: sdk-core → oidc-integration → cas-integration → saml-integration → host-compatibility → release-readiness → wsfed-integration → developer-docs → negotiate-integration
 
 <!-- Spec Guard 按严格串行推进。为兼容上游格式，逗号分组会按左到右顺序展开为单模块步骤，不代表并行授权。 -->
 

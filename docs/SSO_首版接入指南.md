@@ -1,5 +1,7 @@
 # SSO 浏览器 SDK 首版接入指南
 
+> 完整的逐步接入内容已整理为[开发者文档站源码](../apps/docs/content/index.md)。仓库根目录执行 `npm run docs:dev` 阅读；复制代码请使用[完整框架示例](../apps/docs/content/frameworks/typescript.md)。本页保留前后端职责摘要。
+
 本指南面向已有业务后端、且统一认证中心已由后端团队提供的浏览器项目。首版正式验证范围为 **OIDC 授权码 + PKCE、CAS、SAML 2.0** 的“宿主后端完成协议、创建本域会话”模式。一个业务项目选择一种协议入口；前端安装同一个 SDK 包。当前仓库的包仍是 `private` 原型，正式包名和 registry 待定，以下导入名用于本机验证。
 
 ## 前端最小接入
@@ -38,6 +40,8 @@ void sso.ensureAuthenticated().catch(showLoginError);
 | 登出需要 CSRF 头 | `logout.headers` 提供头或返回头的函数 | 校验 CSRF、撤销本域会话并返回 2xx，不对 `fetch` 返回跨站跳转 |
 
 `session.map` 只能处理响应格式，不应放宽身份验证。`getSession()` 把 `401` 当作未登录，把网络/后端故障当作 `error`；`ensureAuthenticated()` 只自动跳转一次，失败后由用户主动重试。
+
+`ensureAuthenticated()` 发起导航后返回未登录结果，不等待整个协议登录结束；回调后新加载的页面再次查询会话。SDK 不自动解析后端 `ssoError`，完整示例由业务页处理白名单反馈。
 
 ## 后端交付清单
 

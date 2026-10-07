@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { XMLParser } from 'fast-xml-parser';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const buildRoot = process.env.SSO_COMPAT_BUILD_ROOT ?? join(root, 'apps/compat/build');
 const parser = new XMLParser();
 
 function send(res, status, body = '', headers = {}) {
@@ -37,11 +38,11 @@ export async function startHost(centerOrigin) {
       const app = url.pathname.match(/^\/(app-a|app-b)(?:\/|$)/)?.[1];
       if (!app) return send(res, 404);
       if (url.pathname === `/${app}/`) {
-        const page = await readFile(join(root, 'apps/compat/build', app === 'app-a' ? 'vue' : 'react', 'index.html'));
+        const page = await readFile(join(buildRoot, app === 'app-a' ? 'vue' : 'react', 'index.html'));
         return send(res, 200, page, { 'Content-Type': 'text/html; charset=utf-8' });
       }
       if (new RegExp(`^/${app}/assets/[\\w-]+\\.js$`).test(url.pathname)) {
-        const source = await readFile(join(root, 'apps/compat/build', app === 'app-a' ? 'vue' : 'react',
+        const source = await readFile(join(buildRoot, app === 'app-a' ? 'vue' : 'react',
           'assets', url.pathname.split('/').at(-1)));
         return send(res, 200, source, { 'Content-Type': 'text/javascript; charset=utf-8' });
       }

@@ -37,6 +37,10 @@ jobs:
         run: openssl version
       - name: Run SDK and protocol regression tests
         run: npm test
+      - name: Build developer documentation
+        run: npm run docs:build
+      - name: Verify documented consumers
+        run: npm run docs:check
       - name: Audit SDK production dependencies
         run: npm audit --omit=dev --workspace=sso-browser-sdk-prototype --audit-level=low
       - name: Report full monorepo dependency audit

@@ -1,10 +1,42 @@
-# SSO Browser SDK（原型）
+# SSO Browser SDK
 
-一个无 Vue/React 运行时依赖的前端 SDK。当前实现的是**宿主后端建立本域会话**的接入模式：SDK 跳转到宿主登录入口，宿主后端与认证中心或域身份服务完成认证并设置本域 Cookie，SDK 返回后查询会话。五个子路径入口分别表示 OIDC、SAML、CAS、WS-Fed 和 Negotiate 的后端会话模式；它们复用同一段前端跳转逻辑。协议验签、验票、换码和 Kerberos 协商不在浏览器 SDK 中进行。
+无框架运行时依赖的浏览器 SDK，通过**业务后端建立的本域 Cookie 会话**接入 SSO。提供会话查询、登录导航、刷新恢复、状态订阅、自动导航防循环、手动重试和本域退出。
 
-本包目前为 `private` 原型。OIDC、CAS、SAML 是首版本机验证范围；WS-Fed 已通过独立 STS/RP 库的本机互操作和 Vue/React 浏览器测试，但仍作为扩展实验入口，等待实际认证中心与业务 RP 联调及扩展版本发布评审。Negotiate 已有本地 HTTP 交互夹具、真实本地 Kerberos 及 HTTP/HTTPS Firefox SDK 互操作；企业真实域、受管浏览器及业务宿主认证模块仍待验证。任何本机结果都不等于生产就绪。
+协议换码、验票、验签和 Kerberos 协商由业务后端完成。认证中心支持标准协议，还需要宿主提供下面的接口，才能接入本包。
 
-## 接入示例
+当前包为 `sso-browser-sdk-prototype@0.0.0`、`private: true`，尚未发布到 registry。OIDC/CAS/SAML 已完成本机参考环境验证；WS-Fed/Negotiate 是实验入口。生产认证中心与真实业务宿主需单独验收。
+
+## 文档与完整示例
+
+- [接入前检查](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/guide/prerequisites.md)
+- [安装与最小接入](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/guide/quick-start.md)
+- [原生 TypeScript](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/frameworks/typescript.md)、[Vue](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/frameworks/vue.md)、[React](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/frameworks/react.md)
+- [后端 HTTP 契约](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/backend/contract.md)、[API](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/api/client.md)、[运行 Demo](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/demos/overview.md)
+
+文档站源码在仓库 `apps/docs`。仓库根目录 `npm ci` 后执行 `npm run docs:dev`，访问终端输出地址。站点尚未线上部署；仓库链接须在本轮改动推送后才可在线读取，当前请使用本地站点。
+
+## 安装当前包
+
+从仓库源码构建，在仓库根目录运行（Node 22.22.0；首次仓库依赖安装还需 JDK）：
+
+```bash
+npm ci
+npm run build --workspace=sso-browser-sdk-prototype
+mkdir -p /private/tmp/sso-sdk-package
+npm pack --workspace=sso-browser-sdk-prototype --pack-destination /private/tmp/sso-sdk-package
+```
+
+再到业务项目目录运行：
+
+```bash
+npm install /private/tmp/sso-sdk-package/sso-browser-sdk-prototype-0.0.0.tgz
+```
+
+临时路径可替换为自己系统的实际目录。包仅含 ESM、类型声明、README 和 LICENSE，无运行时依赖；不要直接导入源码目录。正式包发布前不提供 registry 安装承诺。
+
+## 最小接入
+
+以下用于浏览器受保护页面，替换三个接口路径并保证后端会话返回 `{ authenticated: true, user: { id: string } }`。一个应用使用一个共享实例。
 
 ```ts
 import { createSSO } from 'sso-browser-sdk-prototype';
@@ -16,50 +48,51 @@ const sso = createSSO<{ id: string }>({
   adapter: oidcAdapter({ loginEndpoint: '/sso/oidc/start' }),
 });
 
-// 在应用入口或受保护页面调用。成功后返回本域会话；未登录时跳转一次。
-await sso.ensureAuthenticated();
-
-// 在页面状态管理中订阅：
 const unsubscribe = sso.onAuthChange((state) => {
-  // unknown / checking / authenticated / unauthenticated / error
+  if (state.status === 'authenticated') console.log('已登录', state.user.id);
+  if (state.status === 'error') console.error('会话或登录检查失败', state.error);
 });
 
-// 用户主动登录可重试此前失败的流程。
-sso.login({ returnTo: '/orders' });
+void sso.ensureAuthenticated().catch((error: unknown) => {
+  console.error('检查失败，等待用户手动重试', error);
+});
+window.addEventListener('pagehide', unsubscribe, { once: true });
 
-// 本域登出。全局单点登出需要宿主后端另行协商和实现。
-await sso.logout();
+// 登录按钮：try { sso.login(); } catch (error) { /* 展示错误 */ }
+// 退出按钮：void sso.logout().catch((error) => { /* 展示错误 */ });
 ```
 
-将 `oidcAdapter` 换成 `/saml` 的 `samlAdapter` 或 `/cas` 的 `casAdapter`，并填入该协议在宿主后端的入口。`/wsfed` 的 `wsFedAdapter` 也可用同样方式接入，已完成本机签名 SAML 1.1 互操作；它仍是**扩展实验入口**，不属于首版正式支持声明。`/negotiate` 的 `negotiateAdapter` 使用同源专用挑战入口；本地测试已覆盖脚本化 HTTP 交互，以及 curl／Firefox 与 Java GSSAPI 的真实 Kerberos 互操作，企业受管浏览器和业务宿主仍待验证。业务方无需安装协议专用前端运行时。宿主入口的回跳参数默认叫 `returnTo`，可用 `returnToParam` 配置名称；SDK 只允许同源页面作为回跳目标。完整前后端分工见[首版接入指南](https://github.com/haigeerlab/sso-browser-sdk/blob/main/docs/SSO_首版接入指南.md)。
+`ensureAuthenticated()` 先查询，有会话时返回用户；未登录时发起整页导航并返回未登录结果，**不等待认证中心完成**。回跳后重新加载页面再查询会话。公共页面可只调用 `getSession()`。
 
-## 宿主后端必须提供的接口
+失败后不要自动循环调用；用户主动 `login()` 可重试。`login()` 同步抛错，`logout()` 返回 Promise，按钮代码必须捕获。组件中初始化当前状态并取消订阅，完整按钮及反馈见仓库[示例源码](https://github.com/haigeerlab/sso-browser-sdk/tree/main/apps/docs/examples)。
 
-| 接口 | 最小契约 |
+## 后端最小接口
+
+| 示例路径 | 契约 |
 | --- | --- |
-| `GET /sso/session` | 已登录：`200 {"authenticated":true,"user":{...}}`；未登录：`401` 或 `200 {"authenticated":false}`。应禁止缓存。非 2xx 故障不能伪装成未登录。 |
-| `GET /sso/{protocol}/start?returnTo=...` | 校验回跳仅在本应用允许的路径内。OIDC/CAS/SAML/WS-Fed 由后端发起相应协议；Negotiate 在同源专用入口发出 HTTP 挑战。后端确认身份后设置本域 `HttpOnly` 会话 Cookie，再返回目标页面。 |
-| `POST /sso/logout` | 使本域会话失效，成功返回 2xx（建议 204），不得把跨站跳转作为 `fetch` 响应。需要 CSRF 令牌时，用 `logout.headers` 提供请求头。 |
+| `GET /sso/session` | 已登录返回 `200 {"authenticated":true,"user":{...}}`；未登录返回普通 401 或 `200 {"authenticated":false}`；故障不能伪装访客。返回 JSON，禁止缓存，不导航认证中心。 |
+| `GET /sso/{protocol}/start?returnTo=...` | 校验本应用允许回跳；后端启动协议并处理回调，确认身份后设置本域 HttpOnly Cookie，导航回安全页面。 |
+| `POST /sso/logout` | 按要求验证 CSRF，撤销本域会话，返回成功 2xx；不向 fetch 返回认证中心重定向。 |
 
-Cookie 的 `Secure`、`SameSite`、域名、路径以及跨域部署方式由宿主后端按环境设置。所有业务 API 必须由后端独立验证会话，不能仅根据 SDK 的前端状态放行。
+后端负责协议回调、安全 Cookie、请求关联、防重放及每个业务 API 的权限。SDK 不主动解析 `ssoError`，由业务页与后端约定白名单反馈。本域退出不撤销认证中心、其他业务宿主或系统域凭据。
 
-| 协议 | 后端额外责任 |
-| --- | --- |
-| OIDC | 保存并校验 `state`、`nonce`、PKCE；换取授权码；校验签名、签发者、受众和时效。 |
-| SAML 2.0 | 生成 SP 发起的 Redirect AuthnRequest，在 ACS 接收 POST Response；以固定可信 IdP 证书校验签名、签发者、受众、`Destination`、`Recipient`、时效、`InResponseTo` 和重放。使用一次性服务端 RelayState 关联请求，不能依赖跨站 POST 携带 `SameSite=Lax` Cookie。 |
-| CAS | 固定 `service`，向认证中心一次性验票，校验目标服务并防止重放。 |
-| WS-Fed | 生成 `wa=wsignin1.0` 的 passive 请求，固定 realm/reply，保存一次性 `wctx`；POST 回调用可信证书验证令牌签名、签发者、受众、时效和重放后创建本域会话。跨站 POST 不能依赖 `SameSite=Lax` 宿主 Cookie。 |
-| Negotiate | 配置域、服务主体和浏览器受信任策略，在专用入口处理 HTTP 协商并确认实际机制为 Kerberos 后建立本域会话；未登录的 `GET /sso/session` 不应发出 Negotiate 挑战。NTLM 回退不计入首批通过。真实域联调按[验收模板](https://github.com/haigeerlab/sso-browser-sdk/blob/main/tasks/negotiate-integration/domain-validation.md)记录。 |
+会话字段不同用 `session.map` 映射，回跳参数不同用 `returnToParam`，CSRF 头用 `logout.headers`。这些配置不代替后端认证校验。
 
-仓库中的 [`docs/SSO_SDK_方案调研.md`](https://github.com/haigeerlab/sso-browser-sdk/blob/main/docs/SSO_SDK_方案调研.md) 记录了五种模式的完整流程图与后端边界。
+## 协议入口
 
-## 当前验证范围
+| 子路径 / 函数 | 后端责任 | 状态 |
+| --- | --- | --- |
+| `/oidc` · `oidcAdapter` | 授权码 + PKCE、state/nonce、可信令牌校验 | 首版本机验证 |
+| `/cas` · `casAdapter` | 精确 service、真实验票、过期与重放拒绝 | 首版本机验证 |
+| `/saml` · `samlAdapter` | SP 发起 Redirect/POST、ACS 验签/关联/防重放 | 首版本机验证 |
+| `/wsfed` · `wsFedAdapter` | Web Passive、realm/reply/wctx、签名令牌验证 | 实验，本机 SAML 1.1 证据 |
+| `/negotiate` · `negotiateAdapter` | 专用挑战入口、服务端确认 Kerberos、域与浏览器策略 | 实验，企业域待验收 |
 
-- 仓库根目录 `npm test`：公共状态、回跳约束、五个适配器入口和登出的单元测试；Vue/React 宿主构建；简版前后端交互回归与 Negotiate HTTP 夹具；独立 OIDC、CAS、SAML 与 WS-Fed 实现的互操作测试。Negotiate 夹具的脚本化验证器不是 GSSAPI/Kerberos。首次运行 CAS 测试前按 `services/cas-reference/README.md` 建立 Python 虚拟环境；SAML 测试需 OpenSSL、JDK 和安装时编译的 XSD 验证器，见 `services/saml-reference/README.md`。
-- 仓库根目录执行 `npm run start --workspace=@sso-test/protocol-fixture`，在本机 `127.0.0.1` 与 `localhost` 两个站点模拟认证中心和宿主 A/B。默认打开 OIDC 示例；访问 `/app-a/?protocol=cas`、`/app-a/?protocol=saml` 或 `/app-a/?protocol=wsfed` 可验证简版流程。App A 为 Vue 3.4.0，App B 为 React 19.3.0，两者都用 Vite 5.0.0 构建。默认端口为 43893，可用 `SSO_FIXTURE_PORT` 覆盖。
-- 简版夹具**不实现**真实 OIDC 令牌端点或协议安全验证；CAS XML 验票只处理固定测试响应，SAML/WS-Fed 简版响应未签名。独立参考服务中 WS-Fed 使用 `wsfed` 8.0.0 + `passport-wsfed-saml2` 4.6.4，并锁定签名 SAML 1.1。测试库已归档或计划归档，且私有测试依赖存在审计告警，详见 [`services/wsfed-reference/README.md`](https://github.com/haigeerlab/sso-browser-sdk/blob/main/services/wsfed-reference/README.md)。生产认证中心、真实业务 RP 与 Kerberos 域环境仍需另行验收。
+替换适配器导入与 `loginEndpoint` 即可选择协议，session/logout 沿用后端契约。根入口不导出适配器。登录入口必须是同源路径，不能指向认证中心外域 URL。
 
-`ensureAuthenticated` 使用 `sessionStorage` 记录一次自动跳转；回到应用仍未登录时会抛出登录循环错误。手动 `login()` 可以重试。网络或宿主故障抛错，并使状态为 `error`，不会被当成访客继续跳转。框架只需在入口或路由守卫调用公共 API。示例已在 Vue 3.4.0 + Vite 5.0.0、React 19.3.0 + Vite 5.0.0 下完成从打包 SDK 隔离安装后的类型、开发服务及构建验证；简版服务浏览器联调见仓库的 [`host-compatibility` 验证记录](https://github.com/haigeerlab/sso-browser-sdk/blob/main/tasks/host-compatibility/verification.md)。其他版本尚未形成兼容承诺。
+## 已验证边界
+
+Vue 3.4.0、React/React DOM 19.3.0、Vite 5.0.0 的打包隔离消费者已测试。SDK 不依赖这些框架。Webpack、全局单点登出、完整 SSR、跨源会话与全部浏览器版本未验证。详见[支持矩阵](https://github.com/haigeerlab/sso-browser-sdk/blob/main/apps/docs/content/reference/support.md)。
 
 ## 许可证
 
